@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Firebase Number Uploader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      font-size: 18px;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      font-size: 18px;
+      padding: 12px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #323232;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1000;
+    }
+    .toast.show {
+      opacity: 1;
+    }
+    .btn-red {
+      background: #dc3545;
+    }
+    .btn-red:hover {
+      background: #b02a37;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Update numbx</h2>
+    <input type="text" id="edit1" placeholder="Enter update number 1">
+    <button onclick="updateFirebase('numbx', document.getElementById('edit1').value)">Update number 1</button>
+  </div>
+
+  <div class="card">
+    <h2>Update num2</h2>
+    <input type="text" id="edit2" placeholder="Enter update number 2">
+    <button onclick="updateFirebase('num2', document.getElementById('edit2').value)">Update number 2</button>
+  </div>
+
+  <div class="card">
+    <h2>Update num3</h2>
+    <input type="text" id="edit3" placeholder="Enter update number 3">
+    <button onclick="updateFirebase('num3', document.getElementById('edit3').value)">Update number 3</button>
+  </div>
+
+  <div class="card">
+    <h2>ENTER YOUR WIN</h2>
+    <input type="text" id="edit4" placeholder="Enter WIN value">
+    <button onclick="updateFirebase('win', document.getElementById('edit4').value)">Update WIN</button>
+  </div>
+
+  <div class="card">
+    <h2>ENTER LOSS</h2>
+    <input type="text" id="edit5" placeholder="Enter LOSS value">
+    <button onclick="updateFirebase('loss', document.getElementById('edit5').value)">Update LOSS</button>
+  </div>
+
+  <div class="card">
+    <h2>BIG/SMALL Prediction</h2>
+    <input type="text" id="edit6" placeholder="Enter BIG or SMALL">
+    <button onclick="updateFirebase('big_daxta', document.getElementById('edit6').value)">Update BIG/SMALL</button>
+  </div>
+
+  <div class="card">
+    <h2>⚠️ Clear All Firebase Data</h2>
+    <button class="btn-red" onclick="clearAllFirebase()">Clear All Data</button>
+  </div>
+
+  <div class="toast" id="toast">Updated successfully!</div>
+
+  <script>
+    function updateFirebase(key, value) {
+      const url = `https://abhishek-pvt-default-rtdb.firebaseio.com/${key}/${key}.json`;
+      const body = { [key]: value };
+
+      fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      .then(response => {
+        showToast(response.ok ? "Updated successfully!" : "Error updating!");
+      })
+      .catch(error => {
+        showToast("Error: " + error.message);
+      });
+    }
+
+    function clearAllFirebase() {
+      const keys = ['numbx', 'num2', 'num3', 'win', 'loss', 'big_daxta'];
+      let successCount = 0;
+      keys.forEach((key) => {
+        const url = `https://abhishek-pvt-default-rtdb.firebaseio.com/${key}.json`;
+        fetch(url, { method: 'DELETE' })
+          .then(response => {
+            successCount++;
+            if (successCount === keys.length) {
+              showToast("All data cleared!");
+            }
+          })
+          .catch(err => {
+            showToast("Error clearing: " + key);
+          });
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+  </script>
+
+</body>
+</html>
